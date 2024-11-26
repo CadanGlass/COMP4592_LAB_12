@@ -1,0 +1,103 @@
+@page "/students"
+@using StudentRemote
+@inject StudentRemote.StudentRemoteClient _grpcClient
+@rendermode InteractiveServer
+
+<PageTitle>Students</PageTitle>
+
+<h1>Student Management</h1>
+
+<div class="mb-4">
+    <h3>Add/Edit Student</h3>
+    <div class="form-group">
+        <label>Name:</label>
+        <input class="form-control" @bind="currentStudent.Name" />
+    </div>
+    <div class="form-group">
+        <label>Program:</label>
+        <input class="form-control" @bind="currentStudent.Program" />
+    </div>
+    <button class="btn btn-primary mt-2" @onclick="SaveStudent">
+        @(isEditing ? "Update" : "Add") Student
+    </button>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Program</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var student in students)
+        {
+            <tr>
+                <td>@student.Id</td>
+                <td>@student.Name</td>
+                <td>@student.Program</td>
+                <td>
+                    <button class="btn btn-warning" @onclick="() => EditStudent(student)">Edit</button>
+                    <button class="btn btn-danger" @onclick="() => DeleteStudent(student)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<Student> students = new();
+    private Student currentStudent = new();
+    private bool isEditing = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadStudents();
+    }
+
+    private async Task LoadStudents()
+    {
+        var response = await _grpcClient.GetAllStudentsAsync(new Google.Protobuf.WellKnownTypes.Empty());
+        students = response.Students.ToList();
+    }
+
+    private async Task SaveStudent()
+    {
+        if (isEditing)
+        {
+            await _grpcClient.UpdateStudentAsync(currentStudent);
+        }
+        else
+        {
+            await _grpcClient.AddStudentAsync(currentStudent);
+        }
+
+        await LoadStudents();
+        ResetForm();
+    }
+
+    private async Task DeleteStudent(Student student)
+    {
+        await _grpcClient.DeleteStudentAsync(new StudentLookupModel { Id = student.Id });
+        await LoadStudents();
+    }
+
+    private void EditStudent(Student student)
+    {
+        currentStudent = new Student
+        {
+            Id = student.Id,
+            Name = student.Name,
+            Program = student.Program
+        };
+        isEditing = true;
+    }
+
+    private void ResetForm()
+    {
+        currentStudent = new Student();
+        isEditing = false;
+    }
+} 

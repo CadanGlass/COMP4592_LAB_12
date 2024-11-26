@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "BTLhUMvxcd7dqNuRt3VdaaZpRQglZ3SoO7PxyyC6Hb8=",
+  "Source": "StudentGrpcService",
+  "BasePath": "_content/StudentGrpcService",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

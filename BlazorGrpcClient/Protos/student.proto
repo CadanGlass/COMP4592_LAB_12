@@ -1,0 +1,35 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+
+option csharp_namespace = "StudentRemote";
+
+package student;
+
+// The student service definition
+service StudentRemote {
+  // Get all students
+  rpc GetAllStudents (google.protobuf.Empty) returns (StudentList);
+  // Add a new student
+  rpc AddStudent (Student) returns (Student);
+  // Update existing student
+  rpc UpdateStudent (Student) returns (Student);
+  // Delete a student
+  rpc DeleteStudent (StudentLookupModel) returns (google.protobuf.Empty);
+}
+
+// The student message
+message Student {
+  int32 id = 1;
+  string name = 2;
+  string program = 3;
+}
+
+// A list of students
+message StudentList {
+  repeated Student students = 1;
+}
+
+// Used for looking up a student by ID
+message StudentLookupModel {
+  int32 id = 1;
+} 
